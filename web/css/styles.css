@@ -1,0 +1,39 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+nav {
+  margin-bottom: 20px;
+}
+
+.nav-link {
+  padding: 10px;
+  text-decoration: none;
+  color: blue;
+}
+
+.nav-link.active {
+  font-weight: bold;
+  color: darkblue;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 10px;
+}
+
+table, th, td {
+  border: 1px solid #ddd;
+}
+
+th, td {
+  padding: 8px;
+  text-align: left;
+}
+
+button {
+  padding: 5px 10px;
+  margin: 2px;
+}

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CrudClinic</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- Menú principal -->
+  <nav id="app-nav">
+    <a href="#" class="nav-link active" data-target="sec-pacientes">Pacientes</a>
+    <a href="#" class="nav-link" data-target="sec-especialidades">Especialidades</a>
+    <a href="#" class="nav-link" data-target="sec-medicos">Médicos</a>
+    <a href="#" class="nav-link" data-target="sec-citas">Citas</a>
+    <a href="#" class="nav-link" data-target="sec-import">Importar</a> <!-- Agregado -->
+  </nav>
+
+  <!-- Pacientes -->
+  <section id="sec-pacientes" class="app-section">
+    <h2>Pacientes</h2>
+    <button id="btn-add-paciente">Nuevo Paciente</button>
+    <table id="tbl-pacientes" border="1">
+      <thead>
+        <tr>
+          <th>ID</th><th>Nombre</th><th>Apellido</th><th>Fecha Nac.</th>
+          <th>Teléfono</th><th>Email</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- Especialidades -->
+  <section id="sec-especialidades" class="app-section" style="display:none;">
+    <h2>Especialidades</h2>
+    <button id="btn-add-especialidad">Nueva Especialidad</button>
+    <table id="tbl-especialidades" border="1">
+      <thead>
+        <tr>
+          <th>ID</th><th>Nombre</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- Médicos -->
+  <section id="sec-medicos" class="app-section" style="display:none;">
+    <h2>Médicos</h2>
+    <button id="btn-add-medico">Nuevo Médico</button>
+    <table id="tbl-medicos" border="1">
+      <thead>
+        <tr>
+          <th>ID</th><th>Nombre</th><th>Apellido</th>
+          <th>Especialidad ID</th><th>Email</th><th>Teléfono</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- Citas -->
+  <section id="sec-citas" class="app-section" style="display:none;">
+    <h2>Citas</h2>
+    <button id="btn-add-cita">Nueva Cita</button>
+    <table id="tbl-citas" border="1">
+      <thead>
+        <tr>
+          <th>ID</th><th>Fecha</th><th>Hora</th>
+          <th>Paciente</th><th>Médico</th><th>Motivo</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- Importación CSV/XLSX -->
+  <section id="sec-import" class="app-section" style="display:none;">
+    <h4>Carga masiva (CSV o XLSX)</h4>
+    <form id="form-import">
+      <label>Entidad:</label>
+      <select id="import-entity">
+        <option value="pacientes">pacientes</option>
+        <option value="especialidades">especialidades</option>
+        <option value="medicos">medicos</option>
+        <option value="citas">citas</option>
+        <option value="pagos">pagos</option>
+      </select>
+      <input type="file" id="import-file" accept=".csv,.xlsx,.xls" />
+      <button type="submit">Subir</button>
+    </form>
+    <pre id="import-result" style="margin-top:10px;"></pre>
+  </section>
+
+  <!-- Scripts -->
+  <script src="js/app.js"></script>
+</body>
+</html>
+  
