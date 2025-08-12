@@ -3,89 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CrudClinic</title>
+  <title>Finance Admin · CrudClinic</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-  <!-- Menú principal -->
+  <!-- Navegación -->
   <nav id="app-nav">
-    <a href="#" class="nav-link active" data-target="sec-pacientes">Pacientes</a>
-    <a href="#" class="nav-link" data-target="sec-especialidades">Especialidades</a>
-    <a href="#" class="nav-link" data-target="sec-medicos">Médicos</a>
-    <a href="#" class="nav-link" data-target="sec-citas">Citas</a>
-    <a href="#" class="nav-link" data-target="sec-import">Importar</a> <!-- Agregado -->
+    <a href="#" class="nav-link active" data-target="sec-clients">Clientes</a>
+    <a href="#" class="nav-link" data-target="sec-invoices">Facturas</a>
+    <a href="#" class="nav-link" data-target="sec-payments">Pagos</a>
+    <a href="#" class="nav-link" data-target="sec-reports">Reportes</a>
+    <a href="#" class="nav-link" data-target="sec-import">Importar</a>
   </nav>
 
-  <!-- Pacientes -->
-  <section id="sec-pacientes" class="app-section">
-    <h2>Pacientes</h2>
-    <button id="btn-add-paciente">Nuevo Paciente</button>
-    <table id="tbl-pacientes" border="1">
+  <!-- Clientes -->
+  <section id="sec-clients" class="app-section">
+    <h2>Clientes</h2>
+    <button id="btn-add-client">Nuevo Cliente</button>
+    <table id="tbl-clients" border="1">
       <thead>
         <tr>
-          <th>ID</th><th>Nombre</th><th>Apellido</th><th>Fecha Nac.</th>
-          <th>Teléfono</th><th>Email</th><th>Acciones</th>
+          <th>ID</th>
+          <th>Nombres</th>
+          <th>Documento</th>
+          <th>Teléfono</th>
+          <th>Email</th>
+          <th>Fecha Nac.</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </section>
 
-  <!-- Especialidades -->
-  <section id="sec-especialidades" class="app-section" style="display:none;">
-    <h2>Especialidades</h2>
-    <button id="btn-add-especialidad">Nueva Especialidad</button>
-    <table id="tbl-especialidades" border="1">
+  <!-- Facturas -->
+  <section id="sec-invoices" class="app-section" style="display:none;">
+    <h2>Facturas</h2>
+    <button id="btn-add-invoice">Nueva Factura</button>
+    <table id="tbl-invoices" border="1">
       <thead>
         <tr>
-          <th>ID</th><th>Nombre</th><th>Acciones</th>
+          <th>ID</th>
+          <th># Factura</th>
+          <th>Cliente ID</th>
+          <th>Emisión</th>
+          <th>Vencimiento</th>
+          <th>Total</th>
+          <th>Pagado</th>
+          <th>Saldo</th>
+          <th>Estado</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </section>
 
-  <!-- Médicos -->
-  <section id="sec-medicos" class="app-section" style="display:none;">
-    <h2>Médicos</h2>
-    <button id="btn-add-medico">Nuevo Médico</button>
-    <table id="tbl-medicos" border="1">
+  <!-- Pagos -->
+  <section id="sec-payments" class="app-section" style="display:none;">
+    <h2>Pagos</h2>
+    <button id="btn-add-payment">Nuevo Pago</button>
+    <table id="tbl-payments" border="1">
       <thead>
         <tr>
-          <th>ID</th><th>Nombre</th><th>Apellido</th>
-          <th>Especialidad ID</th><th>Email</th><th>Teléfono</th><th>Acciones</th>
+          <th>ID</th>
+          <th>Invoice ID</th>
+          <th>Transaction ID</th>
+          <th>Monto</th>
+          <th>Fecha Pago</th>
+          <th>Método</th>
+          <th>Acciones</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </section>
 
-  <!-- Citas -->
-  <section id="sec-citas" class="app-section" style="display:none;">
-    <h2>Citas</h2>
-    <button id="btn-add-cita">Nueva Cita</button>
-    <table id="tbl-citas" border="1">
-      <thead>
-        <tr>
-          <th>ID</th><th>Fecha</th><th>Hora</th>
-          <th>Paciente</th><th>Médico</th><th>Motivo</th><th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+  <!-- Reportes -->
+  <section id="sec-reports" class="app-section" style="display:none;">
+    <h2>Reportes</h2>
+    <div class="report-actions">
+      <button id="btn-report-total-paid">Total pagado por cliente</button>
+      <button id="btn-report-pending">Facturas pendientes</button>
+      <label style="margin-left:8px;">
+        Plataforma:
+        <select id="report-platform">
+          <option>Nequi</option>
+          <option>Daviplata</option>
+        </select>
+      </label>
+      <button id="btn-report-platform">Transacciones por plataforma</button>
+    </div>
+    <pre id="report-output" style="margin-top:10px;"></pre>
   </section>
 
   <!-- Importación CSV/XLSX -->
   <section id="sec-import" class="app-section" style="display:none;">
-    <h4>Carga masiva (CSV o XLSX)</h4>
+    <h2>Importar CSV/XLSX</h2>
+    <p>Convierte primero tu Excel a CSV. Formatos esperados: <code>clients.csv</code>, <code>invoices.csv</code>, <code>transactions.csv</code>, <code>payments.csv</code>, <code>platforms.csv</code>.</p>
     <form id="form-import">
       <label>Entidad:</label>
       <select id="import-entity">
-        <option value="pacientes">pacientes</option>
-        <option value="especialidades">especialidades</option>
-        <option value="medicos">medicos</option>
-        <option value="citas">citas</option>
-        <option value="pagos">pagos</option>
+        <option value="clients">clients</option>
+        <option value="invoices">invoices</option>
+        <option value="payments">payments</option>
+        <option value="transactions">transactions</option>
+        <option value="platforms">platforms</option>
       </select>
       <input type="file" id="import-file" accept=".csv,.xlsx,.xls" />
       <button type="submit">Subir</button>
@@ -93,8 +116,7 @@
     <pre id="import-result" style="margin-top:10px;"></pre>
   </section>
 
-  <!-- Scripts -->
+  <!-- Script principal -->
   <script src="js/app.js"></script>
 </body>
 </html>
-  

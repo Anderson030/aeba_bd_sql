@@ -1,145 +1,337 @@
+/* ===== Config ===== */
 const API_BASE = 'http://localhost:4000';
 
-// Navegación simple
+/* ===== Navegación simple ===== */
 document.addEventListener('click', (e) => {
   const a = e.target.closest('#app-nav .nav-link');
   if (!a) return;
   e.preventDefault();
   const target = a.getAttribute('data-target');
-  document.querySelectorAll('.app-section').forEach(s => s.style.display = 'none');
+  document.querySelectorAll('.app-section').forEach(s => (s.style.display = 'none'));
   document.getElementById(target).style.display = 'block';
   document.querySelectorAll('#app-nav .nav-link').forEach(n => n.classList.remove('active'));
   a.classList.add('active');
 });
 
-// Helpers fetch
-async function apiGet(path){ const r=await fetch(`${API_BASE}${path}`); if(!r.ok) throw new Error(await r.text()); return r.json(); }
-async function apiSend(path,method,body){ const r=await fetch(`${API_BASE}${path}`,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body||{})}); if(!r.ok) throw new Error(await r.text()); return r.json(); }
-
-/* ===== PACIENTES ===== */
-const $tblPac = document.querySelector('#tbl-pacientes tbody');
-async function loadPacientes(){
-  const data = await apiGet('/pacientes');
-  $tblPac.innerHTML = data.map(p=>`
-    <tr>
-      <td>${p.id}</td><td>${p.nombre}</td><td>${p.apellido}</td>
-      <td>${p.fecha_nacimiento||''}</td><td>${p.telefono||''}</td><td>${p.email||''}</td>
-      <td>
-        <button class="btn btn-sm btn-outline-primary" data-edit-p="${p.id}">Editar</button>
-        <button class="btn btn-sm btn-outline-danger"  data-del-p="${p.id}">Borrar</button>
-      </td>
-    </tr>`).join('');
-  $tblPac.querySelectorAll('[data-del-p]').forEach(b=>b.onclick=()=>delPaciente(b.dataset.delP));
-  $tblPac.querySelectorAll('[data-edit-p]').forEach(b=>b.onclick=()=>editPaciente(b.dataset.editP));
+/* ===== Helpers fetch ===== */
+async function apiGet(path) {
+  const r = await fetch(`${API_BASE}${path}`);
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
 }
-async function delPaciente(id){ if(!confirm('¿Eliminar?'))return; await fetch(`${API_BASE}/pacientes/${id}`,{method:'DELETE'}); loadPacientes(); }
-async function editPaciente(id){
-  const telefono = prompt('Teléfono (opcional):');
+async function apiSend(path, method, body) {
+  const r = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+/* -----------------------------------------------------------
+   CLIENTS
+----------------------------------------------------------- */
+const $tblClients = document.querySelector('#tbl-clients tbody');
+
+async function loadClients() {
+  const data = await apiGet('/api/clients');
+  $tblClients.innerHTML = data
+    .map(
+      (c) => `
+    <tr>
+      <td>${c.id}</td>
+      <td>${c.first_name} ${c.last_name}</td>
+      <td>${c.document ?? ''}</td>
+      <td>${c.phone ?? ''}</td>
+      <td>${c.email ?? ''}</td>
+      <td>${c.birth_date ?? ''}</td>
+      <td>
+        <button data-edit-client="${c.id}">Editar</button>
+        <button data-del-client="${c.id}">Borrar</button>
+      </td>
+    </tr>`
+    )
+    .join('');
+
+  $tblClients
+    .querySelectorAll('[data-del-client]')
+    .forEach((b) => (b.onclick = () => delClient(b.dataset.delClient)));
+  $tblClients
+    .querySelectorAll('[data-edit-client]')
+    .forEach((b) => (b.onclick = () => editClient(b.dataset.editClient)));
+}
+
+async function delClient(id) {
+  if (!confirm('¿Eliminar cliente?')) return;
+  await fetch(`${API_BASE}/api/clients/${id}`, { method: 'DELETE' });
+  loadClients();
+}
+
+async function editClient(id) {
+  const first_name = prompt('Nombre (deja vacío para no cambiar):');
+  const last_name = prompt('Apellido (deja vacío para no cambiar):');
+  const document = prompt('Documento (deja vacío para no cambiar):');
+  const phone = prompt('Teléfono (opcional):');
   const email = prompt('Email (opcional):');
-  const body = {};
-  if(telefono) body.telefono = telefono;
-  if(email) body.email = email;
-  if(Object.keys(body).length===0) return;
-  await apiSend(`/pacientes/${id}`,'PUT',body); loadPacientes();
+  const birth_date = prompt('Fecha nac. YYYY-MM-DD (opcional):');
+
+  const payload = {};
+  if (first_name) payload.first_name = first_name;
+  if (last_name) payload.last_name = last_name;
+  if (document) payload.document = document;
+  if (phone) payload.phone = phone;
+  if (email) payload.email = email;
+  if (birth_date) payload.birth_date = birth_date;
+
+  if (Object.keys(payload).length === 0) return;
+  await apiSend(`/api/clients/${id}`, 'PUT', payload);
+  loadClients();
 }
-document.getElementById('btn-add-paciente').onclick = async ()=>{
-  const nombre=prompt('Nombre:'); if(!nombre) return;
-  const apellido=prompt('Apellido:'); if(!apellido) return;
-  const fecha_nacimiento=prompt('Fecha nacimiento (YYYY-MM-DD):'); if(!fecha_nacimiento) return;
-  const telefono=prompt('Teléfono (opcional):'); const email=prompt('Email (opcional):');
-  await apiSend('/pacientes','POST',{nombre,apellido,fecha_nacimiento,telefono,email}); loadPacientes();
+
+document.getElementById('btn-add-client').onclick = async () => {
+  const first_name = prompt('Nombre:');
+  if (!first_name) return;
+  const last_name = prompt('Apellido:');
+  if (!last_name) return;
+  const document = prompt('Documento:');
+  if (!document) return;
+  const phone = prompt('Teléfono (opcional):');
+  const email = prompt('Email (opcional):');
+  const birth_date = prompt('Fecha nac. YYYY-MM-DD (opcional):');
+
+  await apiSend('/api/clients', 'POST', {
+    first_name,
+    last_name,
+    document,
+    phone,
+    email,
+    birth_date
+  });
+  loadClients();
 };
 
-/* ===== ESPECIALIDADES ===== */
-const $tblEsp = document.querySelector('#tbl-especialidades tbody');
-async function loadEspecialidades(){
-  const data = await apiGet('/especialidades');
-  $tblEsp.innerHTML = data.map(e=>`
+/* -----------------------------------------------------------
+   INVOICES  (listar desde invoices_summary)
+----------------------------------------------------------- */
+const $tblInvoices = document.querySelector('#tbl-invoices tbody');
+
+async function loadInvoices() {
+  const data = await apiGet('/api/invoices');
+  $tblInvoices.innerHTML = data
+    .map(
+      (i) => `
     <tr>
-      <td>${e.id}</td><td>${e.nombre}</td>
+      <td>${i.id}</td>
+      <td>${i.invoice_number}</td>
+      <td>${i.client_id}</td>
+      <td>${i.issue_date}</td>
+      <td>${i.due_date}</td>
+      <td>${i.total_amount}</td>
+      <td>${i.paid_amount}</td>
+      <td>${i.balance}</td>
+      <td>${i.status}</td>
       <td>
-        <button class="btn btn-sm btn-outline-primary" data-edit-e="${e.id}">Renombrar</button>
-        <button class="btn btn-sm btn-outline-danger"  data-del-e="${e.id}">Borrar</button>
+        <button data-edit-inv="${i.id}">Editar</button>
+        <button data-del-inv="${i.id}">Borrar</button>
       </td>
-    </tr>`).join('');
-  $tblEsp.querySelectorAll('[data-del-e]').forEach(b=>b.onclick=()=>delEspecialidad(b.dataset.delE));
-  $tblEsp.querySelectorAll('[data-edit-e]').forEach(b=>b.onclick=()=>editEspecialidad(b.dataset.editE));
+    </tr>`
+    )
+    .join('');
+
+  $tblInvoices
+    .querySelectorAll('[data-del-inv]')
+    .forEach((b) => (b.onclick = () => delInvoice(b.dataset.delInv)));
+  $tblInvoices
+    .querySelectorAll('[data-edit-inv]')
+    .forEach((b) => (b.onclick = () => editInvoice(b.dataset.editInv)));
 }
-async function delEspecialidad(id){ if(!confirm('¿Eliminar?'))return; await fetch(`${API_BASE}/especialidades/${id}`,{method:'DELETE'}); loadEspecialidades(); }
-async function editEspecialidad(id){
-  const nombre = prompt('Nuevo nombre:'); if(!nombre) return;
-  await apiSend(`/especialidades/${id}`,'PUT',{nombre}); loadEspecialidades();
+
+async function delInvoice(id) {
+  if (!confirm('¿Eliminar factura?')) return;
+  await fetch(`${API_BASE}/api/invoices/${id}`, { method: 'DELETE' });
+  loadInvoices();
 }
-document.getElementById('btn-add-especialidad').onclick = async ()=>{
-  const nombre=prompt('Nombre:'); if(!nombre) return;
-  await apiSend('/especialidades','POST',{nombre}); loadEspecialidades();
+
+async function editInvoice(id) {
+  const invoice_number = prompt('# Factura (opcional):');
+  const client_id = prompt('Client ID (opcional):');
+  const issue_date = prompt('Emisión YYYY-MM-DD (opcional):');
+  const due_date = prompt('Vencimiento YYYY-MM-DD (opcional):');
+  const total_amount = prompt('Total (opcional):');
+
+  const payload = {};
+  if (invoice_number) payload.invoice_number = invoice_number;
+  if (client_id) payload.client_id = Number(client_id);
+  if (issue_date) payload.issue_date = issue_date;
+  if (due_date) payload.due_date = due_date;
+  if (total_amount) payload.total_amount = Number(total_amount);
+
+  if (Object.keys(payload).length === 0) return;
+  await apiSend(`/api/invoices/${id}`, 'PUT', payload);
+  loadInvoices();
+}
+
+document.getElementById('btn-add-invoice').onclick = async () => {
+  const client_id = Number(prompt('Client ID:'));
+  if (!client_id) return;
+  const invoice_number = prompt('# Factura:');
+  if (!invoice_number) return;
+  const issue_date = prompt('Emisión YYYY-MM-DD:');
+  if (!issue_date) return;
+  const due_date = prompt('Vencimiento YYYY-MM-DD:');
+  if (!due_date) return;
+  const total_amount = Number(prompt('Total:'));
+  if (!total_amount && total_amount !== 0) return;
+
+  await apiSend('/api/invoices', 'POST', {
+    client_id,
+    invoice_number,
+    issue_date,
+    due_date,
+    total_amount
+  });
+  loadInvoices();
 };
 
-/* ===== MÉDICOS ===== */
-const $tblMed = document.querySelector('#tbl-medicos tbody');
-async function loadMedicos(){
-  const data = await apiGet('/medicos');
-  $tblMed.innerHTML = data.map(m=>`
+/* -----------------------------------------------------------
+   PAYMENTS
+----------------------------------------------------------- */
+const $tblPayments = document.querySelector('#tbl-payments tbody');
+
+async function loadPayments() {
+  const data = await apiGet('/api/payments');
+  $tblPayments.innerHTML = data
+    .map(
+      (p) => `
     <tr>
-      <td>${m.id}</td><td>${m.nombre}</td><td>${m.apellido}</td>
-      <td>${m.especialidad_id}</td><td>${m.email||''}</td><td>${m.telefono||''}</td>
+      <td>${p.id}</td>
+      <td>${p.invoice_id}</td>
+      <td>${p.transaction_id ?? ''}</td>
+      <td>${p.amount}</td>
+      <td>${p.payment_date ?? ''}</td>
+      <td>${p.method ?? ''}</td>
       <td>
-        <button class="btn btn-sm btn-outline-primary" data-edit-m="${m.id}">Editar</button>
-        <button class="btn btn-sm btn-outline-danger"  data-del-m="${m.id}">Borrar</button>
+        <button data-edit-pay="${p.id}">Editar</button>
+        <button data-del-pay="${p.id}">Borrar</button>
       </td>
-    </tr>`).join('');
-  $tblMed.querySelectorAll('[data-del-m]').forEach(b=>b.onclick=()=>delMedico(b.dataset.delM));
-  $tblMed.querySelectorAll('[data-edit-m]').forEach(b=>b.onclick=()=>editMedico(b.dataset.editM));
+    </tr>`
+    )
+    .join('');
+
+  $tblPayments
+    .querySelectorAll('[data-del-pay]')
+    .forEach((b) => (b.onclick = () => delPayment(b.dataset.delPay)));
+  $tblPayments
+    .querySelectorAll('[data-edit-pay]')
+    .forEach((b) => (b.onclick = () => editPayment(b.dataset.editPay)));
 }
-async function delMedico(id){ if(!confirm('¿Eliminar?'))return; await fetch(`${API_BASE}/medicos/${id}`,{method:'DELETE'}); loadMedicos(); }
-async function editMedico(id){
-  const email=prompt('Email (opcional):'); const telefono=prompt('Teléfono (opcional):');
-  const nombre=prompt('Nombre (opcional):'); const apellido=prompt('Apellido (opcional):');
-  const especialidad_id=prompt('Especialidad ID (opcional):');
-  const body={}; if(email)body.email=email; if(telefono)body.telefono=telefono; if(nombre)body.nombre=nombre; if(apellido)body.apellido=apellido;
-  if(especialidad_id) body.especialidad_id=Number(especialidad_id);
-  if(Object.keys(body).length===0) return;
-  await apiSend(`/medicos/${id}`,'PUT',body); loadMedicos();
+
+async function delPayment(id) {
+  if (!confirm('¿Eliminar pago?')) return;
+  await fetch(`${API_BASE}/api/payments/${id}`, { method: 'DELETE' });
+  loadPayments();
 }
-document.getElementById('btn-add-medico').onclick = async ()=>{
-  const nombre=prompt('Nombre:'); if(!nombre) return;
-  const apellido=prompt('Apellido:'); if(!apellido) return;
-  const especialidad_id=Number(prompt('Especialidad ID:')); if(!especialidad_id) return;
-  const email=prompt('Email (opcional):'); const telefono=prompt('Teléfono (opcional):');
-  await apiSend('/medicos','POST',{nombre,apellido,especialidad_id,email,telefono}); loadMedicos();
+
+async function editPayment(id) {
+  const invoice_id = prompt('Invoice ID (opcional):');
+  const transaction_id = prompt('Transaction ID (opcional):');
+  const amount = prompt('Monto (opcional):');
+  const payment_date = prompt('Fecha pago YYYY-MM-DD (opcional):');
+  const method = prompt('Método (opcional):');
+
+  const payload = {};
+  if (invoice_id) payload.invoice_id = Number(invoice_id);
+  if (transaction_id !== null && transaction_id !== '') {
+    payload.transaction_id = Number(transaction_id);
+  }
+  if (amount) payload.amount = Number(amount);
+  if (payment_date) payload.payment_date = payment_date;
+  if (method) payload.method = method;
+
+  if (Object.keys(payload).length === 0) return;
+  await apiSend(`/api/payments/${id}`, 'PUT', payload);
+  loadPayments();
+}
+
+document.getElementById('btn-add-payment').onclick = async () => {
+  const invoice_id = Number(prompt('Invoice ID:'));
+  if (!invoice_id) return;
+  const amount = Number(prompt('Monto:'));
+  if (!amount) return;
+  const payment_date = prompt('Fecha pago YYYY-MM-DD (opcional):');
+  const method = prompt('Método (opcional):');
+  const transaction_id = prompt('Transaction ID (opcional):');
+
+  await apiSend('/api/payments', 'POST', {
+    invoice_id,
+    amount,
+    payment_date: payment_date || null,
+    method: method || null,
+    transaction_id: transaction_id ? Number(transaction_id) : null
+  });
+  loadPayments();
 };
 
-/* ===== CITAS ===== */
-const $tblCitas = document.querySelector('#tbl-citas tbody');
-async function loadCitas(){
-  const data = await apiGet('/citas');
-  $tblCitas.innerHTML = data.map(c=>`
-    <tr>
-      <td>${c.id}</td><td>${c.fecha||''}</td><td>${c.hora||''}</td>
-      <td>${c.paciente||('#'+c.paciente_id)}</td><td>${c.medico||('#'+c.medico_id)}</td>
-      <td>${c.motivo||''}</td>
-      <td>
-        <button class="btn btn-sm btn-outline-primary" data-edit-c="${c.id}">Editar</button>
-        <button class="btn btn-sm btn-outline-danger"  data-del-c="${c.id}">Borrar</button>
-      </td>
-    </tr>`).join('');
-  $tblCitas.querySelectorAll('[data-del-c]').forEach(b=>b.onclick=()=>delCita(b.dataset.delC));
-  $tblCitas.querySelectorAll('[data-edit-c]').forEach(b=>b.onclick=()=>editCita(b.dataset.editC));
-}
-async function delCita(id){ if(!confirm('¿Eliminar?'))return; await fetch(`${API_BASE}/citas/${id}`,{method:'DELETE'}); loadCitas(); }
-async function editCita(id){
-  const motivo=prompt('Nuevo motivo (opcional):'); const body={}; if(motivo) body.motivo=motivo;
-  if(Object.keys(body).length===0) return;
-  await apiSend(`/citas/${id}`,'PUT',body); loadCitas();
-}
-document.getElementById('btn-add-cita').onclick = async ()=>{
-  const paciente_id=Number(prompt('ID Paciente:')); if(!paciente_id) return;
-  const medico_id=Number(prompt('ID Médico:')); if(!medico_id) return;
-  const fecha=prompt('Fecha (YYYY-MM-DD):'); if(!fecha) return;
-  const hora=prompt('Hora (HH:MM):'); if(!hora) return;
-  const motivo=prompt('Motivo (opcional):');
-  await apiSend('/citas','POST',{paciente_id,medico_id,fecha,hora,motivo}); loadCitas();
+/* -----------------------------------------------------------
+   REPORTES
+----------------------------------------------------------- */
+const $reportOut = document.getElementById('report-output');
+
+document.getElementById('btn-report-total-paid').onclick = async () => {
+  const res = await apiGet('/api/reports/total-paid-by-client');
+  $reportOut.textContent = JSON.stringify(res, null, 2);
 };
 
-// Carga inicial
-loadPacientes(); loadEspecialidades(); loadMedicos(); loadCitas();
+document.getElementById('btn-report-pending').onclick = async () => {
+  const res = await apiGet('/api/reports/pending-invoices');
+  $reportOut.textContent = JSON.stringify(res, null, 2);
+};
+
+document.getElementById('btn-report-platform').onclick = async () => {
+  const platform = document.getElementById('report-platform').value || 'Nequi';
+  const res = await apiGet(`/api/reports/transactions-by-platform?platform=${encodeURIComponent(platform)}`);
+  $reportOut.textContent = JSON.stringify(res, null, 2);
+};
+
+/* -----------------------------------------------------------
+   IMPORT (CSV a /api/import/:entity con FormData)
+----------------------------------------------------------- */
+document.getElementById('form-import')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const entity = document.getElementById('import-entity').value;
+  const fileEl = document.getElementById('import-file');
+  const file = fileEl.files[0];
+
+  if (!file) {
+    document.getElementById('import-result').textContent = 'Selecciona un archivo CSV.';
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append('file', file);
+
+  try {
+    const r = await fetch(`${API_BASE}/api/import/${encodeURIComponent(entity)}`, {
+      method: 'POST',
+      body: fd
+    });
+    const j = await r.json();
+    document.getElementById('import-result').textContent = JSON.stringify(j, null, 2);
+
+    // refrescar tablas si corresponde
+    if (entity === 'clients') await loadClients();
+    if (entity === 'invoices') await loadInvoices();
+    if (entity === 'payments') await loadPayments();
+  } catch (err) {
+    document.getElementById('import-result').textContent = `Error: ${err.message}`;
+  } finally {
+    fileEl.value = '';
+  }
+});
+
+/* ===== Carga inicial ===== */
+function safe(fn) { try { fn(); } catch (_) {} }
+safe(loadClients);
+safe(loadInvoices);
+safe(loadPayments);
