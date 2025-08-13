@@ -28,22 +28,38 @@ Payments: Stores payment transactions, including payment ID, invoice ID, amount,
 ----------------------------------------------------------------------------------------------------------------------------
 Project Structure
 
+Project Structure
 The project is organized into the following main folders and files:
-server/ – Contains the backend code of the application.
+
+server/ – Contains the application's backend code.
+
 db.js – Configures the connection to the Supabase database.
-index.js – Main server file that starts the Express application and loads routes.
-routes/ – Contains different route files for each module of the API.
-clients.js – CRUD operations for customers.
+
+index.js – Main server file that launches the Express application and loads routes.
+
+routes/ – Contains different route files for each API module.
+
+clients.js – CRUD operations for clients.
+
 invoices.js – CRUD operations for invoices.
+
 payments.js – CRUD operations for payments.
-reports.js – Endpoints for reporting, such as total payments, pending invoices, and transactions by platform.
-import.js – Handles importing CSV files into the database.
-web/ – Contains the frontend part of the project.
+
+reports.js – Endpoints for reports, such as total payments, outstanding invoices, and transactions by platform.
+
+import.js – Manages the import of CSV files into the database.
+
+web/ – Contains the frontend portion of the project.
+
 index.html – Main HTML page for testing and interacting with the API.
-css/ – Stylesheets fo the frontend.
+
+css/ – Stylesheets for the frontend portion.
+
 js/ – JavaScript files for frontend functionality.
+
 .env – Environment variables (not shared in the repository) used to configure the Supabase connection and server port.
-package.json – Lists project dependencies and scripts.
+
+package.json – Lists the project's dependencies and scripts.
 ---------------------------------------------------------------------------------------------------------------------------------
 Features:
 
